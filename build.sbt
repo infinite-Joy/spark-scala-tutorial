@@ -26,7 +26,9 @@ libraryDependencies ++= Seq(
   "org.apache.spark"  %% "spark-repl"      % sparkVersion,
 
   "org.scalatest"     %% "scalatest"       % scalaTestVersion  % "test",
+  "io.continuum.bokeh" %% "bokeh" % "0.6",
   "org.scalacheck"    %% "scalacheck"      % scalaCheckVersion % "test")
+
 
 
 initialCommands += """
