@@ -34,49 +34,52 @@ object LogisticRegressionApp extends App{
 
   try {
     // Create the rdd of the s3 csv data.
-    val rawData = sc.textFile("data/stumble_upon/train.tsv")
-    val header = rawData.first()
-    val rawData1 = rawData.filter(line => line != header)
-    val records = rawData1.map(line => line.split("\t"))
+    val rawData = sc.textFile("/Users/joydeep/thinking/spark-scala-tutorial/logisticregression/data/stumble_upon/train.tsv")
+    println("something")
+    val header = rawData.take(1)(0)
+    println(2)
+    //val rawData1 = rawData.filter(line => line != header)
+    println(3)
+    //val records = rawData1.map(line => line.split("\t"))
 
-    val data = records.map{ r =>
-      val trimmed = r.map(_.replaceAll("\"", ""))
-      val label = trimmed(r.size - 1).toInt
-      val features = trimmed.slice(22, r.size - 1).map(d => if (d == "?") 0.0 else d.toDouble)
-      assert(features.size == 4)
-      StumbleUpon(features(0), features(1), features(2), features(3), label)
-    }
+    //val data = records.map{ r =>
+    //  val trimmed = r.map(_.replaceAll("\"", ""))
+    //  val label = trimmed(r.size - 1).toInt
+    //  val features = trimmed.slice(22, r.size - 1).map(d => if (d == "?") 0.0 else d.toDouble)
+    //  assert(features.size == 4)
+    //  StumbleUpon(features(0), features(1), features(2), features(3), label)
+    //}
 
-    val dataDF = data.toDF()
+    //val dataDF = data.toDF()
 
-    val featureCols = Array("numberOfLinks", "numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio")
-    val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
-    val df2 = assembler.transform(dataDF)
+    //val featureCols = Array("numberOfLinks", "numwords_in_url", "parametrizedLinkRatio", "spelling_errors_ratio")
+    //val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
+    //val df2 = assembler.transform(dataDF)
 
-    val Array(trainingData, testData) = df2.randomSplit(Array(0.7, 0.3))
+    //val Array(trainingData, testData) = df2.randomSplit(Array(0.7, 0.3))
 
-    val lr = new LogisticRegression().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.8)
-    val model = lr.fit(trainingData)
-    val predictions = model.transform(testData)
+    //val lr = new LogisticRegression().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.8)
+    //val model = lr.fit(trainingData)
+    //val predictions = model.transform(testData)
 
-    val trainingSummary  = model.summary
-    val objectiveHistory = trainingSummary.objectiveHistory
-    objectiveHistory.foreach(loss => println(loss))
-    val binarySummary = trainingSummary.asInstanceOf[BinaryLogisticRegressionSummary]
+    //val trainingSummary  = model.summary
+    //val objectiveHistory = trainingSummary.objectiveHistory
+    //objectiveHistory.foreach(loss => println(loss))
+    //val binarySummary = trainingSummary.asInstanceOf[BinaryLogisticRegressionSummary]
 
-    val roc = binarySummary.roc
-    roc.show()
-    println(binarySummary.areaUnderROC)
+    //val roc = binarySummary.roc
+    //roc.show()
+    //println(binarySummary.areaUnderROC)
 
-    val fMeasure = binarySummary.fMeasureByThreshold
-    val fm = fMeasure.col("F-Measure")
-    val maxFMeasure = fMeasure.select(max("F-Measure")).head().getDouble(0)
-    val bestThreshold = fMeasure.where($"F-Measure" === maxFMeasure).select("threshold").head().getDouble(0)
-    model.setThreshold(bestThreshold)
+    //val fMeasure = binarySummary.fMeasureByThreshold
+    //val fm = fMeasure.col("F-Measure")
+    //val maxFMeasure = fMeasure.select(max("F-Measure")).head().getDouble(0)
+    //val bestThreshold = fMeasure.where($"F-Measure" === maxFMeasure).select("threshold").head().getDouble(0)
+    //model.setThreshold(bestThreshold)
 
-    val evaluator = new BinaryClassificationEvaluator().setLabelCol("label")
-    val accuracy = evaluator.evaluate(predictions)
-    println(accuracy)
+    //val evaluator = new BinaryClassificationEvaluator().setLabelCol("label")
+    //val accuracy = evaluator.evaluate(predictions)
+    //println(accuracy)
 
   } catch {
     case e: FileNotFoundException => e.printStackTrace()
